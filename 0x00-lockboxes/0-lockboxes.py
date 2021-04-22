@@ -13,8 +13,7 @@ def canUnlockAll(boxes):
         p += 1
     for e in range(1, len(boxes)):
         if e in o_b:
-            if len(boxes) - 1 == e:
-                return True
+            return True
         else:
             return False
     return True
