@@ -4,7 +4,7 @@
 
 def canUnlockAll(boxes):
     """ function to determine if the boxes can be open  """
-    o_b = [0]
+    o_b = []
     for y in o_b:
         if y <= len(boxes):
             for i in boxes[y]:
