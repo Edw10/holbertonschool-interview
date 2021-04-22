@@ -8,12 +8,12 @@ def canUnlockAll(boxes):
     p = 0
     for y in boxes:
         for i in y:
-            if i != p and i not in o_b:
+            if i not in o_b:
                 o_b.append(i)
-        p += 1
     for e in range(1, len(boxes)):
         if e in o_b:
-            return True
+            if len(boxes) - 1 == e:
+                return True
         else:
             return False
     return True
