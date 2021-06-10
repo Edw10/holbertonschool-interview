@@ -16,11 +16,11 @@ int check_cycle(listint_t *list)
 
 	aux = list;
 	aux1 = list;
-	while (aux1->next && aux1->next->next)
+	while (aux->next && aux->next->next)
 	{
 		aux = aux->next->next;
 		aux1 = aux1->next;
-		if (aux1 == aux)
+		if (aux == aux1)
 			return (1);
 	}
 	return (0);
