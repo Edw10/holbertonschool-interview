@@ -13,14 +13,15 @@ int check_cycle(listint_t *list)
 
 	if (list == NULL)
 		return (0);
+
 	aux = list;
 	aux1 = list->next;
-	while (aux1->next && aux1->next->next)
+	while (aux1->next && aux1)
 	{
 		if (aux1 > aux || aux1 == aux)
 			return (1);
 		aux = aux->next;
-		aux1 = aux1->next->next;
+		aux1 = aux1->next;
 	}
 	return (0);
 }
