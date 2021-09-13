@@ -1,53 +1,58 @@
 #!/usr/bin/python3
-""" recursive function that queries the Reddit API """
+"""This module is in charge of making the connection with the
+    api and parses the title of all hot articles, and prints a
+    sorted count of given keywords."""
 import requests
-import sys
 
 
-def count_words(subreddit, word_list, kw_count={}, next_page=None, reap_kw={}):
-    """ all hot posts by keyword """
-    headers = {"User-Agent": "Juan-Bogota"}
+def process_subreddit(hot_subreddits, word_list):
+    """This method parses the title of all hot articles,
+        and prints a sorted count of given keywords."""
+    list_all = {}
 
-    if next_page:
-        subRhot = requests.get('https://reddit.com/r/' + subreddit +
-                               '/hot.json?after=' + next_page,
-                               headers=headers)
-    else:
-        subRhot = requests.get('https://reddit.com/r/' + subreddit +
-                               '/hot.json', headers=headers)
-
-    if subRhot.status_code == 404:
+    if hot_subreddits is None:
         return
 
-    if kw_count == {}:
-        for word in word_list:
-            kw_count[word] = 0
-            reap_kw[word] = word_list.count(word)
+    lowered_words = list(map(lambda x: x.lower(), word_list))
 
-    subRhot_dict = subRhot.json()
-    subRhot_data = subRhot_dict['data']
-    next_page = subRhot_data['after']
-    subRhot_posts = subRhot_data['children']
+    for word in lowered_words:
+        total = 0
+        for hot_subreddit in hot_subreddits:
+            if word in hot_subreddit.lower():
+                total += hot_subreddit.lower().split().count(word)
+        if total > 0:
+            if word not in list_all:
+                list_all[word] = total
+            else:
+                list_all[word] += total
 
-    for post in subRhot_posts:
-        post_data = post['data']
-        post_title = post_data['title']
-        title_words = post_title.split()
-        for w in title_words:
-            for key in kw_count:
-                if w.lower() == key.lower():
-                    kw_count[key] += 1
+    result = sorted(list_all.items(), key=lambda x: x[0])
+    result = sorted(result, key=lambda x: x[1], reverse=True)
+    for k, v in result:
+        print("{}: {}".format(k, v))
 
-    if next_page:
-        count_words(subreddit, word_list, kw_count, next_page, reap_kw)
 
+def count_words(subreddit, word_list, hot_list=[], after=""):
+    """This method gets all hot articles for a given subreddit"""
+    headers = {"user-agent": "1637-holberton"}
+
+    if after is None:
+        return process_subreddit(hot_list, word_list)
+
+    if after == "":
+        r = requests.get('https://www.reddit.com/r/{}/hot.json'.format(
+            subreddit), headers=headers, allow_redirects=False)
     else:
-        for key, value in reap_kw.items():
-            if value > 1:
-                kw_count[key] *= value
+        r = requests.get(
+            'https://www.reddit.com/r/{}/hot.json?after={}'.format(
+                subreddit, after), headers=headers, allow_redirects=False)
 
-        sorted_abc = sorted(kw_count.items(), key=lambda x: x[0])
-        sorted_res = sorted(sorted_abc, key=lambda x: (-x[1], x[0]))
-        for res in sorted_res:
-            if res[1] > 0:
-                print('{}: {}'.format(res[0], res[1]))
+    if r.status_code != 200:
+        return None
+
+    after = r.json().get("data").get("after")
+
+    for child in r.json().get("data").get("children"):
+        hot_list.append(child.get("data").get("title"))
+
+    return count_words(subreddit, word_list, hot_list, after)
