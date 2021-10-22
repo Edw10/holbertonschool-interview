@@ -1,77 +1,70 @@
 #!/usr/bin/python3
-""" doc """
+"""
+Script that solves the N queens problem based on the general Backtracking
+algorithm.
+This is:
+procedure bt(c) is
+    if reject(P, c) then return
+    if accept(P, c) then output(P, c)
+    s  first(P, c)
+    while s  NULL do
+        bt(s)
+        s  next(P, s)
+"""
 import sys
-if len(sys.argv) != 2:
-    print("Usage: nqueens N")
-    exit(1)
-try:
-    N = eval(sys.argv[1])
-except Exception:
-    print("N must be a number")
-    exit(1)
-if (N < 4):
-    print('N must be at least 4')
-    exit(1)
-Grid = [[0]*N for _ in range(N)]
-Nq = [N]
-solution = []
 
 
-def attack(i, j):
-    """ doc """
-    for k in range(N):
-        if Grid[i][k] == 1 or Grid[k][j] == 1:
-            return True
-    for k in range(N):
-        for z in range(N):
-            if (k + z == i + j) or (k - z == i - j):
-                if Grid[k][z] == 1:
-                    return True
-    return False
+def valid_pos(solution, pos):
+    """
+    Function that verifies if the position is valid
+    """
+    for queen in solution:
+        if queen[1] == pos[1]:
+            return False
+        if (queen[0] + queen[1]) == (pos[0] + pos[1]):
+            return False
+        if (queen[0] - queen[1]) == (pos[0] - pos[1]):
+            return False
+    return True
 
 
-def Nqueens(n, x):
-    """ doc """
-    for i in range(x, N):
-        for j in range(N):
-            if (not(attack(i, j))) and (Grid[i][j] != 1):
-                Grid[i][j] = 1
-                Nq[0] = Nq[0] - 1
-                Nqueens(n - 1, i + 1)
-                if Nq[0] == 0:
-                    position()
-                Grid[i][j] = 0
-                Nq[0] = Nq[0] + 1
-    return False
-
-
-def reset(N):
-    """ doc """
-    for k in range(N):
-        for z in range(N):
-            Grid[k][z] = 0
-
-
-def validate(N):
-    """ doc """
-    suma = 0
-    store = []
-    for k, i in enumerate(Grid):
-        if 1 in i:
-            store.append([k, i.index(1)])
-            suma += 1
-    if suma == N:
-        return store
+def solve_queens(row, n, solution):
+    """
+    Function that finds the solution recursively, from the root down
+    """
+    if (row == n):
+        print(solution)
     else:
-        return []
+        for col in range(n):
+            pos = [row, col]
+            if valid_pos(solution, pos):
+                solution.append(pos)
+                solve_queens(row + 1, n, solution)
+                solution.remove(pos)
 
 
-def position():
-    """ doc """
-    x = validate(N)
-    if len(x) == N and x not in solution:
-        print(x)
-        solution.append(x)
+def main(n):
+    """
+    Main function
+    """
+    solution = []
+    """ From root(0) down(n) """
+    solve_queens(0, n, solution)
 
+if __name__ == '__main__':
+    """ Validate the arguments from OS """
+    if len(sys.argv) != 2:
+        print('Usage: nqueens N')
+        sys.exit(1)
+    try:
+        i = int(sys.argv[1])
+    except BaseException:
+        print('N must be a number')
+        sys.exit(1)
+    i = int(sys.argv[1])
+    if i < 4:
+        print('N must be at least 4')
+        sys.exit(1)
 
-Nqueens(N, 0)
+    """ Calling the main function """
+    main(i)
