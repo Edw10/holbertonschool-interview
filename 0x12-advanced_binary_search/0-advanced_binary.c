@@ -1,81 +1,51 @@
 #include "search_algos.h"
 
 /**
- * advanced_binary - Prints an array of integers
- *
- * @array: The array to be searched the value
- * @size: Number of elements in @array
- * @value: number to search in array
- *
- * Return: If value is not present in array or if array is NULL,
- * your function must return -1
- */
-int advanced_binary(int *array, size_t size, int value)
+* search - search function
+* @array: array
+* @min: min value array
+* @max: max value array
+* @value: value to look for
+* Return: the index of the value searched
+*/
+int search(int *array, int min, int max, int value)
 {
+	int mid = (min + max)  / 2, i;
 
-	if (array == NULL)
+	if (min > max)
 		return (-1);
-
-	return (search_advanced_binary(array, value, 0, size - 1));
-}
-
-/**
- * search_advanced_binary - Recursion function to search in array
- *
- * @array: The array to be searched the value
- * @value: number to search in array
- * @start: start index to search in array
- * @end: end index to search in array
- *
- * Return: If value is not present in array or if array is NULL,
- * your function must return -1
- */
-int search_advanced_binary(int *array, int value, int start, int end)
-{
-	int temp_size, index_half;
-
-	if ((abs(start) - abs(end)) == 0)
-		return (-1);
-
-	temp_size = ((abs(end) - abs(start)) / 2) + 1;
-	index_half = (start + end) / 2;
-
-	print_search(array, start, end);
-	if (array[index_half] == value)
+	printf("Searching in array: ");
+	for (i = min; i <= max; i++)
 	{
-		if (temp_size <= 2)
-			return (index_half);
+		if (i == max)
+			printf("%d\n", array[i]);
 		else
-			return (search_advanced_binary(array, value,
-						       start, index_half));
-	} else if (array[index_half] < value)
-	{
-		return (search_advanced_binary(array, value,
-					       index_half + 1, end));
-	} else if (array[index_half] > value)
-	{
-		return (search_advanced_binary(array, value, start, index_half));
+			printf("%d, ", array[i]);
 	}
+	if (array[mid] == value)
+	{
+		if (array[mid - 1] == value)
+			return (search(array, min, mid, value));
+		return (mid);
+	}
+	else if (array[mid] >= value)
+		return (search(array, min, mid, value));
+	else
+		return (search(array, mid + 1, max, value));
 	return (-1);
 }
-
 /**
- * print_search - Prints search in array
- *
- * @array: The array to be printed
- * @start: start index to print in array
- * @end: end index to print in array
- */
-void print_search(const int *array, int start, int end)
+* advanced_binary - binary search
+* @array: pointer of array to search in
+* @size: numbers of elements in array
+* @value: value to search for
+* Return: the index of the value searched
+*/
+int advanced_binary(int *array, size_t size, int value)
 {
-	int i;
+	int min = 0, max = (int)size - 1;
 
-	printf("Searching in array: ");
-	for (i = start; i <= end; i++)
-	{
-		if (i > start)
-			printf(", ");
-		printf("%d", array[i]);
-	}
-	printf("\n");
+	if (array == NULL || size <= 0)
+		return (-1);
+	return (search(array, min, max, value));
 }
